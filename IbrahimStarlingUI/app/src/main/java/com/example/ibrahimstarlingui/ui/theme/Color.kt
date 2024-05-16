@@ -12,3 +12,7 @@ val Pink40 = Color(0xFF7D5260)
 
 val StarlingBlue = Color(0xFFDBE8FF)
 val StarlingPurp = Color(0xFF514EA4)
+val StarlingBackground = Color(0xFFEEF1FC)
+val StarlingGoodRisk = Color(0xFFD9EFE4)
+val StarlingLowRisk = Color(0xFFFBF3D3)
+val StarlingMedRisk = Color(0xFFF9EBDE)
