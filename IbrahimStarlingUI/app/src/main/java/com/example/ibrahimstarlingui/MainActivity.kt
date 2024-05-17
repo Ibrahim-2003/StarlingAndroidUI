@@ -9,9 +9,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,19 +28,28 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -64,6 +75,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontWeight
@@ -100,8 +112,9 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.Q)
 @Composable
-@Preview(showBackground = true)
+//@Preview(showBackground = true)
 fun Homepage() {
+    val scrollState = rememberScrollState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(modifier = Modifier
         .fillMaxSize()
@@ -126,6 +139,50 @@ fun Homepage() {
             }, scrollBehavior = scrollBehavior
             )
 
+        },
+        bottomBar = {
+            BottomAppBar(containerColor = Color.White) {
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 40.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center) {
+                        Icon(
+                            imageVector = Icons.Default.Home,
+                            contentDescription = "Homepage"
+                        )
+                        Text(
+                            text = "Home"
+                        )
+                    }
+                    Column(horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Symptoms",
+                            tint = Color.Gray
+                        )
+                        Text(
+                            "Symptoms",
+                            color = Color.Gray
+                        )
+                    }
+                    Column(horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center) {
+                        Icon(
+                            imageVector = Icons.Default.Favorite,
+                            contentDescription = "Health",
+                            tint = Color.Gray
+                        )
+                        Text(
+                            text = "Health",
+                            color = Color.Gray
+                        )
+                    }
+                }
+            }
         }
     ) { values ->
         Column(
@@ -133,10 +190,12 @@ fun Homepage() {
                 .fillMaxSize()
                 .background(color = StarlingBackground)
                 .padding(values)
+                .verticalScroll(scrollState)
         ) {
             ScoreCard(riskLevel = null)
             DaysLogger(daysActive = daily_dots)
             AppointmentCard()
+            AboutCard()
         }
     }
 }
@@ -275,11 +334,202 @@ fun AppointmentCard(){
                     fontSize = 15.sp,
                     color = Color.Gray)
             }
-            Button(onClick = { /*TODO*/ }) {
+            Button(onClick = { /*TODO*/ },
+                colors = ButtonDefaults.buttonColors(containerColor = StarlingPurp)
+            ) {
                 Text(text = "Request")
             }
         }
 
+    }
+}
+
+@Composable
+@Preview(showBackground = false)
+fun AboutCard(){
+    Spacer(modifier = Modifier.height(20.dp))
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .background(color = StarlingBlue)
+        .padding(vertical = 10.dp)){
+        Column(verticalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .padding(horizontal = 10.dp)) {
+            Text(
+                text = "About UrinDx",
+                color = StarlingPurp,
+                fontSize = 30.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+            val scrollState = rememberScrollState()
+            Row (verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(scrollState)) {
+                DailyUseCard()
+                Spacer(modifier = Modifier.width(10.dp))
+                TelehealthCard()
+                Spacer(modifier = Modifier.width(10.dp))
+                CleaningCard()
+                Spacer(modifier = Modifier.width(10.dp))
+                ExpectTelehealthCard()
+            }
+            Surface (modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+                .padding(bottom = 20.dp)
+                .clip(RoundedCornerShape(50f))
+                .background(Color.White)) {
+                Column(modifier = Modifier.fillMaxWidth()
+                    .padding(horizontal = 10.dp)){
+                    Row(horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(vertical = 5.dp)){
+                        Text(
+                            text = "?    Help Center",
+                            fontSize = 25.sp,
+                            color = StarlingPurp
+                        )
+                        Icon(imageVector = Icons.Default.KeyboardArrowRight,
+                            contentDescription = "Go to Help Center",
+                            tint = StarlingPurp,
+                            modifier = Modifier.size(35.dp))
+                    }
+                    Divider()
+                    Row(horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(vertical = 5.dp)){
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(imageVector = Icons.Outlined.Send,
+                                contentDescription = "Chat Support",
+                                tint = StarlingPurp)
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Text(
+                                text = "Chat Support",
+                                fontSize = 25.sp,
+                                color = StarlingPurp
+                            )
+                        }
+                        Icon(imageVector = Icons.Default.KeyboardArrowRight,
+                            contentDescription = "Go to Chat Support",
+                            tint = StarlingPurp,
+                            modifier = Modifier.size(35.dp))
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DailyUseCard(){
+    Surface(
+        modifier = Modifier
+            .height(300.dp)
+            .width(180.dp)
+            .padding(vertical = 10.dp)
+            .clip(RoundedCornerShape(50f))
+            .background(Color.White)
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center){
+            Image(
+                painterResource(id = R.drawable.use_urindx),
+                contentDescription = "Daily Use Instructions",
+                Modifier.size(120.dp)
+            )
+            Text(
+                text = "Daily Use Instructions",
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .padding(horizontal = 10.dp)
+                    .padding(top = 10.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun TelehealthCard(){
+    Surface(
+        modifier = Modifier
+            .height(300.dp)
+            .width(180.dp)
+            .padding(vertical = 10.dp)
+            .clip(RoundedCornerShape(50f))
+            .background(Color.White)
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center){
+            Image(
+                painterResource(id = R.drawable.telehealth_appointment),
+                contentDescription = "How to Join Telehealth Call",
+                Modifier.size(140.dp)
+            )
+            Text(
+                text = "How to Join Telehealth Call",
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(horizontal = 10.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun CleaningCard(){
+    Surface(
+        modifier = Modifier
+            .height(300.dp)
+            .width(180.dp)
+            .padding(vertical = 10.dp)
+            .clip(RoundedCornerShape(50f))
+            .background(Color.White)
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center){
+            Image(
+                painterResource(id = R.drawable.clean_urindx),
+                contentDescription = "How to Clean UrinDx",
+                Modifier.size(140.dp)
+            )
+            Text(
+                text = "How to Clean UrinDx",
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(horizontal = 10.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun ExpectTelehealthCard(){
+    Surface(
+        modifier = Modifier
+            .height(300.dp)
+            .width(180.dp)
+            .padding(vertical = 10.dp)
+            .clip(RoundedCornerShape(50f))
+            .background(Color.White)
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center){
+            Image(
+                painterResource(id = R.drawable.telehealth_appointment),
+                contentDescription = "Telehealth - What to Expect",
+                Modifier.size(140.dp)
+            )
+            Text(
+                text = "Telehealth - What to Expect",
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(horizontal = 10.dp)
+            )
+        }
     }
 }
 
