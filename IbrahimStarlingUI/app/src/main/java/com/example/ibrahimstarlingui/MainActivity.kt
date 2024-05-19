@@ -1,18 +1,19 @@
-package com.example.ibrahimstarlingui
+/*
+Starling Homepage UI
+Created by Ibrahim Al-Akash on 2024-05-17.
+*/
 
-import android.graphics.fonts.FontStyle
+package com.example.ibrahimstarlingui
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,64 +27,47 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.ibrahimstarlingui.ui.theme.IbrahimStarlingUITheme
 import com.example.ibrahimstarlingui.ui.theme.StarlingBackground
 import com.example.ibrahimstarlingui.ui.theme.StarlingBlue
@@ -91,10 +75,11 @@ import com.example.ibrahimstarlingui.ui.theme.StarlingGoodRisk
 import com.example.ibrahimstarlingui.ui.theme.StarlingLowRisk
 import com.example.ibrahimstarlingui.ui.theme.StarlingMedRisk
 import com.example.ibrahimstarlingui.ui.theme.StarlingPurp
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
-import java.util.Locale
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -103,7 +88,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             IbrahimStarlingUITheme {
-                Homepage()
+                Navigation()
             }
         }
     }
@@ -112,90 +97,102 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.Q)
 @Composable
-//@Preview(showBackground = true)
-fun Homepage() {
+fun MainScreen(navController: NavController) {
     val scrollState = rememberScrollState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-    Scaffold(modifier = Modifier
-        .fillMaxSize()
-        .nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = {
-            CenterAlignedTopAppBar(title = {
-                Text(
-                    text = "Hey Wassim!",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp,
-                    textAlign = TextAlign.Center
-                )
-            }, actions = {
-                IconButton(onClick = { /*TODO*/ }) {
-                    Icon(
-                        imageVector = Icons.Default.AccountCircle,
-                        tint = StarlingPurp,
-                        contentDescription = "Profile",
-                        modifier = Modifier.size(40.dp)
-                    )
-                }
-            }, scrollBehavior = scrollBehavior
-            )
 
-        },
-        bottomBar = {
-            BottomAppBar(containerColor = Color.White) {
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 40.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center) {
+    val viewModel = viewModel<MainViewModel>()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = isLoading)
+
+    SwipeRefresh(state = swipeRefreshState, onRefresh = {
+        viewModel.loadStuff()
+    }) {
+        Scaffold(modifier = Modifier
+            .fillMaxSize()
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
+            topBar = {
+                CenterAlignedTopAppBar(title = {
+                    Text(
+                        text = "Hey Ibrahim!",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }, actions = {
+                    IconButton(onClick = { /*TODO*/ }) {
                         Icon(
-                            imageVector = Icons.Default.Home,
-                            contentDescription = "Homepage"
-                        )
-                        Text(
-                            text = "Home"
+                            imageVector = Icons.Default.AccountCircle,
+                            tint = StarlingPurp,
+                            contentDescription = "Profile",
+                            modifier = Modifier.size(40.dp)
                         )
                     }
-                    Column(horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "Symptoms",
-                            tint = Color.Gray
-                        )
-                        Text(
-                            "Symptoms",
-                            color = Color.Gray
-                        )
-                    }
-                    Column(horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center) {
-                        Icon(
-                            imageVector = Icons.Default.Favorite,
-                            contentDescription = "Health",
-                            tint = Color.Gray
-                        )
-                        Text(
-                            text = "Health",
-                            color = Color.Gray
-                        )
+                }, scrollBehavior = scrollBehavior
+                )
+
+            },
+            bottomBar = {
+                BottomAppBar(containerColor = Color.White) {
+                    Row(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 40.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center) {
+                            Icon(
+                                imageVector = Icons.Default.Home,
+                                contentDescription = "Homepage"
+                            )
+                            Text(
+                                text = "Home"
+                            )
+                        }
+                        Column(horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Symptoms",
+                                tint = Color.Gray
+                            )
+                            Text(
+                                "Symptoms",
+                                color = Color.Gray
+                            )
+                        }
+                        Column(horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center,
+                            modifier = Modifier.clickable {
+                                navController.navigate(Screen.HealthScreen.route)
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Favorite,
+                                contentDescription = "Health",
+                                tint = Color.Gray
+                            )
+                            Text(
+                                text = "Health",
+                                color = Color.Gray
+                            )
+                        }
                     }
                 }
             }
-        }
-    ) { values ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(color = StarlingBackground)
-                .padding(values)
-                .verticalScroll(scrollState)
-        ) {
-            ScoreCard(riskLevel = null)
-            DaysLogger(daysActive = daily_dots)
-            AppointmentCard()
-            AboutCard()
+        ) { values ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(color = StarlingBackground)
+                    .padding(values)
+                    .verticalScroll(scrollState)
+            ) {
+                ScoreCard(riskLevel = null)
+                DaysLogger(daysActive = daily_dots)
+                AppointmentCard()
+                AboutCard()
+            }
         }
     }
 }
@@ -215,11 +212,12 @@ fun ScoreCard(riskLevel: String?){
             .padding(15.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceEvenly){
-            Column(){
+            Column{
                 if (riskLevel == null) {
                     Row(verticalAlignment = Alignment.CenterVertically){
                         Text(text = "No Score Today",
-                            fontSize = 20.sp)
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.SemiBold)
                         Icon(
                             imageVector = Icons.Outlined.Info,
                             contentDescription = "Info",
@@ -326,7 +324,8 @@ fun AppointmentCard(){
             Column(modifier = Modifier
                 .padding(end = 30.dp)){
                 Text(text = "Appointments",
-                    fontSize = 20.sp)
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.SemiBold)
 
                 Spacer(modifier = Modifier.height(5.dp))
                 Text(text =
@@ -345,7 +344,6 @@ fun AppointmentCard(){
 }
 
 @Composable
-@Preview(showBackground = false)
 fun AboutCard(){
     Spacer(modifier = Modifier.height(20.dp))
     Box(modifier = Modifier
@@ -380,29 +378,32 @@ fun AboutCard(){
                 .padding(bottom = 20.dp)
                 .clip(RoundedCornerShape(50f))
                 .background(Color.White)) {
-                Column(modifier = Modifier.fillMaxWidth()
+                Column(modifier = Modifier
+                    .fillMaxWidth()
                     .padding(horizontal = 10.dp)){
                     Row(horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .padding(vertical = 5.dp)){
                         Text(
                             text = "?    Help Center",
                             fontSize = 25.sp,
                             color = StarlingPurp
                         )
-                        Icon(imageVector = Icons.Default.KeyboardArrowRight,
+                        Icon(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                             contentDescription = "Go to Help Center",
                             tint = StarlingPurp,
                             modifier = Modifier.size(35.dp))
                     }
-                    Divider()
+                    HorizontalDivider()
                     Row(horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .padding(vertical = 5.dp)){
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(imageVector = Icons.Outlined.Send,
+                            Icon(imageVector = Icons.AutoMirrored.Outlined.Send,
                                 contentDescription = "Chat Support",
                                 tint = StarlingPurp)
                             Spacer(modifier = Modifier.width(10.dp))
@@ -412,7 +413,7 @@ fun AboutCard(){
                                 color = StarlingPurp
                             )
                         }
-                        Icon(imageVector = Icons.Default.KeyboardArrowRight,
+                        Icon(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                             contentDescription = "Go to Chat Support",
                             tint = StarlingPurp,
                             modifier = Modifier.size(35.dp))
@@ -672,7 +673,7 @@ fun Circle(days: Int) {
                 startAngle = 130f,
                 sweepAngle = 280f,
                 useCenter = false,
-                style = Stroke(width = 20f, cap = StrokeCap.Round)
+                style = Stroke(width = 30f, cap = StrokeCap.Round)
             )
         })
         Canvas(modifier = Modifier.size(200.dp), onDraw = {
@@ -682,7 +683,7 @@ fun Circle(days: Int) {
                 sweepAngle = 360f * days / (Calendar.getInstance()
                     .getActualMaximum(Calendar.DAY_OF_MONTH)),
                 useCenter = false,
-                style = Stroke(width = 20f, cap = StrokeCap.Round)
+                style = Stroke(width = 30f, cap = StrokeCap.Round)
             )
         })
         Text(
@@ -705,14 +706,14 @@ fun Circle(days: Int) {
             Row(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = "0",
-                    fontSize = 20.sp,
-                    modifier = Modifier.padding(start = 40.dp),
+                    fontSize = 30.sp,
+                    modifier = Modifier.padding(start = 45.dp),
                     textAlign = TextAlign.Center
                 )
                 Text(
                     Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH).toString(),
-                    fontSize = 20.sp,
-                    modifier = Modifier.padding(start = 85.dp),
+                    fontSize = 30.sp,
+                    modifier = Modifier.padding(start = 63.dp),
                     textAlign = TextAlign.Center
                 )
             }
@@ -755,8 +756,6 @@ fun CircleWithBorder(
     fillColor: Color
 ) {
     Canvas(modifier = modifier.size(radius * 2)) {
-        val centerX = size.width / 2
-        val centerY = size.height / 2
         val radiusFloat = radius.toPx()
 
         // Draw the border circle
