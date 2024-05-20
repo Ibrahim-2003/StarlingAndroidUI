@@ -18,5 +18,8 @@ fun Navigation(){
         composable(route = Screen.HealthScreen.route){
             HealthScreen(navController = navController)
         }
+        composable(route = Screen.ProfileScreen.route){
+            ProfileScreen(navController = navController)
+        }
     }
 }

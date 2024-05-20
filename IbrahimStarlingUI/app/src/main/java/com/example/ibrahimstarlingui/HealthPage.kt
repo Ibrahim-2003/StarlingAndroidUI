@@ -5,7 +5,6 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -49,7 +48,6 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -274,13 +272,16 @@ fun TestChips(){
         when (selectedIndex){
             0 -> PerformanceChart(
                 modifier = Modifier
-                .padding(all = 20.dp), sampleWeekData)
+                .padding(all = 20.dp), sampleWeekData
+            )
             1 -> PerformanceChart(
                 modifier = Modifier
-                .padding(all = 20.dp), sampleMonthData)
+                .padding(all = 20.dp), sampleMonthData
+            )
             2 -> PerformanceChart(
                 modifier = Modifier
-                .padding(all = 20.dp), sampleSixMonthData)
+                .padding(all = 20.dp), sampleSixMonthData
+            )
             else -> println("Error with chip selection")
         }
 
