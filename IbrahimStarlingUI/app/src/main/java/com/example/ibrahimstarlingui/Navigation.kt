@@ -16,7 +16,7 @@ fun Navigation(){
             MainScreen(navController = navController)
         }
         composable(route = Screen.HealthScreen.route){
-            HealthScreen(navController = navController)
+            HealthScreen()
         }
         composable(route = Screen.ProfileScreen.route){
             ProfileScreen(navController = navController)

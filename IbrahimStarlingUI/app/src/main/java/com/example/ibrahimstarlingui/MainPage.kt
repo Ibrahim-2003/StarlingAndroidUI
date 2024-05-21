@@ -178,7 +178,6 @@ fun MainScreen(navController: NavController) {
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ScoreCard(riskLevel: String?){
     Surface(
@@ -288,7 +287,6 @@ fun ScoreCard(riskLevel: String?){
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppointmentCard(){
     Surface(
