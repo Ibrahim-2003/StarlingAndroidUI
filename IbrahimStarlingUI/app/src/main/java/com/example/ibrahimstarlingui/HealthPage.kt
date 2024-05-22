@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -37,7 +35,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -46,7 +43,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
@@ -58,11 +54,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import com.example.ibrahimstarlingui.ui.theme.StarlingBackground
 import com.example.ibrahimstarlingui.ui.theme.StarlingGoodRisk
 import com.example.ibrahimstarlingui.ui.theme.StarlingLowRisk
@@ -504,19 +498,12 @@ private fun DrawCirclePoints(scores: List<Float?>, datesList: List<LocalDate>, m
                 )
 
                 // Draw the filled circle inside
-//                val fillColor = when {
-//                    score < 0.47f -> StarlingGoodRisk
-//                    score in 0.47f..0.765f -> StarlingLowRisk
-//                    else -> StarlingMedRisk
-//                }
-
-                var fillColor: Color
-                if (score < 0.47f){
-                    fillColor = StarlingGoodRisk
+                val fillColor: Color = if (score < 0.47f){
+                    StarlingGoodRisk
                 } else if (score < 0.765f){
-                    fillColor = StarlingLowRisk
+                    StarlingLowRisk
                 } else {
-                    fillColor = StarlingMedRisk
+                    StarlingMedRisk
                 }
 
                 drawCircle(
