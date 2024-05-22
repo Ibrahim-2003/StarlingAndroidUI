@@ -52,11 +52,11 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.ibrahimstarlingui.ui.theme.StarlingBackground
 import com.example.ibrahimstarlingui.ui.theme.StarlingGoodRisk
 import com.example.ibrahimstarlingui.ui.theme.StarlingLowRisk
@@ -71,8 +71,8 @@ import kotlin.random.Random
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-@Preview(showBackground = true)
-fun HealthScreen(){
+//@Preview(showBackground = true)
+fun HealthScreen(navController: NavController){
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val scrollState = rememberScrollState()
@@ -109,7 +109,7 @@ fun HealthScreen(){
                         Column(horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center,
                             modifier = Modifier.clickable {
-//                                navController.navigate(Screen.MainScreen.route)
+                                navController.navigate(Screen.MainScreen.route)
                             }) {
                             Icon(
                                 imageVector = Icons.Default.Home,
@@ -134,10 +134,7 @@ fun HealthScreen(){
                             )
                         }
                         Column(horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center,
-                            modifier = Modifier.clickable {
-//                                navController.navigate(Screen.HealthScreen.route)
-                            }
+                            verticalArrangement = Arrangement.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Favorite,
@@ -226,26 +223,41 @@ fun TestChips(){
     }
 
     when (selectedRange){
-        TimeRange.LAST_7_DAYS -> Text(
-            text = "Apr 19 - Apr 22",
-            fontSize = 20.sp,
-            modifier = Modifier
-                .padding(bottom = 20.dp)
-        )
-        TimeRange.LAST_MONTH -> Text(
-            text = "Apr 19 - Apr 22",
-            fontSize = 20.sp,
-            modifier = Modifier
-                .padding(bottom = 20.dp)
-        )
-        TimeRange.LAST_6_MONTHS -> Text(
-            text = "Feb 19 - Apr 22",
-            fontSize = 20.sp,
-            modifier = Modifier
-                .padding(bottom = 20.dp)
-        )
+        TimeRange.LAST_7_DAYS -> {
+            val dataPair = getWeekData(scores = sampleScores)
+            val endDate = dataPair.second.first().format(DateTimeFormatter.ofPattern("MMM dd"))
+            val startDate = dataPair.second.last().format(DateTimeFormatter.ofPattern("MMM dd"))
+            Text(
+                text = "$startDate - $endDate",
+                fontSize = 20.sp,
+                modifier = Modifier
+                    .padding(bottom = 20.dp)
+            )
+        }
+        TimeRange.LAST_MONTH -> {
+            val dataPair = getMonthData(scores = sampleScores)
+            val endDate = dataPair.second.last().format(DateTimeFormatter.ofPattern("MMM dd"))
+            val startDate = dataPair.second.first().format(DateTimeFormatter.ofPattern("MMM dd"))
+            Text(
+                text = "$startDate - $endDate",
+                fontSize = 20.sp,
+                modifier = Modifier
+                    .padding(bottom = 20.dp)
+            )
+        }
+        TimeRange.LAST_6_MONTHS -> {
+            val dataPair = getSixMonthData(scores = sampleScores)
+            val endDate = dataPair.second.last().format(DateTimeFormatter.ofPattern("MMM yyyy"))
+            val startDate = dataPair.second.first().format(DateTimeFormatter.ofPattern("MMM yyyy"))
+            Text(
+                text = "$startDate - $endDate",
+                fontSize = 20.sp,
+                modifier = Modifier
+                    .padding(bottom = 20.dp)
+            )
+        }
         null -> Text(
-            text = "Apr 19 - Apr 22",
+            text = "No data to show",
             fontSize = 20.sp,
             modifier = Modifier
                 .padding(bottom = 20.dp)
@@ -299,7 +311,7 @@ fun TestChips(){
 
         when (selectedRange){
             TimeRange.LAST_7_DAYS -> PerformanceChart(
-                modifier = Modifier.padding(bottom = 20.dp),
+                modifier = Modifier.padding(all = 20.dp),
                 range = TimeRange.LAST_7_DAYS.ordinal,
                 scores = sampleScores
             )
@@ -320,12 +332,7 @@ fun TestChips(){
     Spacer(modifier = Modifier.height(20.dp))
 }
 
-val sampleWeekData = listOf(0.1f, 0.45f, 0.56f, 0.76f)
-val sampleMonthData = listOf(0.2f, 0.3f, 0.45f, 0.8f, 0.3f)
-val sampleSixMonthData = listOf(0.76f, 0.54f, 0.53f, 0.3f)
-
-val sampleScores = List(180) { Random.nextFloat() }
-
+val sampleScores = List(300) { Random.nextFloat() }
 
 enum class TimeRange {
     LAST_7_DAYS, LAST_MONTH, LAST_6_MONTHS
@@ -384,11 +391,11 @@ private fun getMonthData(scores: List<Float?>): Pair<List<Float?>, List<LocalDat
     }
 }
 
-fun getFirstOfEachMonthBetween(startDate: LocalDate, currentDate: LocalDate) : List<LocalDate> {
+fun getFirstOfEachMonthBetween(startDate: LocalDate, endDate: LocalDate) : List<LocalDate> {
     val firstOfEachMonth = mutableListOf<LocalDate>()
     var current = startDate.plusMonths(1).withDayOfMonth(1)
     // Move to the first of the next month
-    while (current.isBefore(currentDate) || current.isEqual(currentDate)) {
+    while (current.isBefore(endDate) || current.isEqual(endDate)) {
         firstOfEachMonth.add(current)
         current = current.plusMonths(1)
     }
@@ -418,7 +425,11 @@ private fun getSixMonthData(scores: List<Float?>): Pair<List<Float?>, List<Local
         )
     }
 
-    return Pair(scores, datesList)
+    return if (scores.count() > ChronoUnit.DAYS.between(startDate, endDate).toInt()) {
+        Pair(scores.subList(0,180), datesList)
+    } else {
+        Pair(scores, datesList)
+    }
 }
 
 @Composable
@@ -462,14 +473,41 @@ private fun DrawDemLines(startDate: LocalDate, endDate: LocalDate, datesList: Li
             LabelAxisTime(text = datesList.last().format(getDateFormatter(timeRange)), 0.85f)
         }
         TimeRange.LAST_6_MONTHS.ordinal -> {
-
+            val endDateLabel = datesList.last().format(DateTimeFormatter.ofPattern("MMM yyyy"))
+            val startDateLabel = datesList.first().format(DateTimeFormatter.ofPattern("MMM yyyy"))
+            val lastMonthLabels = getLastMonthLabels(datesList)
+            val x1: Float = ChronoUnit.DAYS.between(lastMonthLabels.last(), datesList.last()).toFloat() /
+                    ChronoUnit.DAYS.between(datesList.first(), datesList.last()).toFloat()
+            val x2: Float = ChronoUnit.DAYS.between(lastMonthLabels.first(), datesList.last()).toFloat() /
+                    ChronoUnit.DAYS.between(datesList.first(), datesList.last()).toFloat()
+            Canvas(modifier = Modifier.fillMaxSize()
+                    .padding(horizontal = 20.dp)){
+                drawLine(
+                    color = Color.Gray,
+                    start = Offset(x = size.width*x1, y = 0f),
+                    end = Offset(x = size.width*x1, y = size.height - 20.dp.toPx()),
+                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
+                )
+            }
+            LabelAxisTime(text = startDateLabel, x1)
+            Canvas(modifier = Modifier.fillMaxSize()
+                .padding(horizontal = 20.dp)){
+                drawLine(
+                    color = Color.Gray,
+                    start = Offset(x = size.width*x2, y = 0f),
+                    end = Offset(x = size.width*x2, y = size.height - 20.dp.toPx()),
+                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
+                )
+            }
+            LabelAxisTime(text = endDateLabel,
+                deltaTimePerc = x2 - 0.15f)
         }
     }
 }
 
-private fun getLastMonthLabels(dateList: List<LocalDate>) : Pair<LocalDate, LocalDate>{
+private fun getLastMonthLabels(dateList: List<LocalDate>) : List<LocalDate>{
     val firstsList = getFirstOfEachMonthBetween(dateList.first(), dateList.last())
-    return Pair(firstsList.first(), firstsList.last())
+    return firstsList
 }
 
 @Composable
@@ -477,11 +515,11 @@ private fun DrawCirclePoints(scores: List<Float?>, datesList: List<LocalDate>, m
                              radius: Dp, borderWidth: Dp){
 
     val deltaTot: Float = ChronoUnit.DAYS.between(datesList.first(), datesList.last()).toFloat()
-    val nonNullScores = scores.filterNotNull()
-    val minScore = nonNullScores.minOrNull() ?: 0f
-    val maxScore = nonNullScores.maxOrNull() ?: 1f
+    val minScore = 0f
+    val maxScore = 1f
 
-    Canvas(modifier = modifier.fillMaxSize()) {
+    Canvas(modifier = modifier.fillMaxSize()
+                .padding(bottom = 20.dp)) {
         val radiusFloat = radius.toPx()
         scores.forEachIndexed { index, score ->
             if (score != null) {
@@ -520,11 +558,11 @@ private fun DrawCirclePoints(scores: List<Float?>, datesList: List<LocalDate>, m
 private fun DrawLinesScores(scores: List<Float?>, datesList: List<LocalDate>, modifier: Modifier){
 
     val deltaTot: Float = ChronoUnit.DAYS.between(datesList.first(), datesList.last()).toFloat()
-    val nonNullScores = scores.filterNotNull()
-    val minScore = nonNullScores.minOrNull() ?: 0f
-    val maxScore = nonNullScores.maxOrNull() ?: 1f
+    val minScore = 0f
+    val maxScore = 1f
 
-    Canvas(modifier = modifier.fillMaxSize()) {
+    Canvas(modifier = modifier.fillMaxSize()
+                .padding(bottom = 20.dp)) {
         val path = Path()
         var isFirstPoint = true
 
@@ -568,15 +606,12 @@ fun PerformanceChart(modifier: Modifier = Modifier, range: Int, scores: List<Flo
     when (range){
         TimeRange.LAST_7_DAYS.ordinal -> {
             dataPair = getWeekData(scores)
-            println(dataPair)
         }
         TimeRange.LAST_MONTH.ordinal -> {
             dataPair = getMonthData(scores)
-            println(dataPair)
         }
         TimeRange.LAST_6_MONTHS.ordinal -> {
             dataPair = getSixMonthData(scores)
-            println(dataPair)
         }
         else -> {
             Text(
